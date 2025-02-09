@@ -8,18 +8,18 @@ module.exports = function (api) {
       //   "@babel/preset-react",
     ],
     plugins: [
-      [
-        "module-resolver",
-        {
-          extensions: [".tsx", ".ts", ".js", ".json"],
-          alias: {
-            // crypto: "react-native-quick-crypto",
-            // stream: "readable-stream",
-            // buffer: "@craftzdog/react-native-buffer",
-            // "pouchdb-collate": "@craftzdog/pouchdb-collate-react-native",
-          },
-        },
-      ],
+      // [
+      //   "module-resolver",
+      //   {
+      //     extensions: [".tsx", ".ts", ".js", ".json"],
+      //     alias: {
+      //       // crypto: "react-native-quick-crypto",
+      //       // stream: "readable-stream",
+      //       // buffer: "@craftzdog/react-native-buffer",
+      //       // "pouchdb-collate": "@craftzdog/pouchdb-collate-react-native",
+      //     },
+      //   },
+      // ],
     ],
   };
 };

@@ -1,4 +1,3 @@
-import "./shim";
 import React, { useEffect } from "react";
 import {
   StyleSheet,
@@ -33,7 +32,7 @@ export default function App() {
     setIsLoading(false);
 
     pouch.info().then((info: any) => {
-      console.log("db info", info);
+      console.log("connected to pouchdb :)", info);
       setReady(true);
     });
 
@@ -44,8 +43,11 @@ export default function App() {
     };
   }, []);
 
-  const safeAsyncCall = async (callback: () => Promise<void>) => {
-    if (isLoading) return; // Prevent concurrent actions
+  const safeAsyncCall = async (
+    callback: () => Promise<void>,
+    shouldSetResult = true
+  ) => {
+    if (isLoading) return;
     setIsLoading(true);
     setResult("");
     try {
@@ -53,7 +55,7 @@ export default function App() {
       await Promise.race([callback(), timeoutPromise(TIMEOUT_DURATION)]);
     } catch (error: any) {
       console.error("Error:", error);
-      setResult(`Error: ${error.message}`);
+      if (shouldSetResult) setResult(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +69,7 @@ export default function App() {
 
   const handleGetDoc = () =>
     safeAsyncCall(async () => {
-      console.log("get", docId);
       const mydoc = await pouch.get(docId);
-      console.log("got", mydoc);
       setResult(JSON.stringify(mydoc, null, 2));
     });
 
@@ -78,16 +78,21 @@ export default function App() {
       let rev,
         count = 0;
 
-      // try {
-      //   const mydoc = await pouch.get(docId);
-      //   console.log("mydoc exists!", mydoc);
-      //   rev = mydoc._rev;
-      //   count = mydoc.count || 0;
-      // } catch {
-      //   console.log("Document not found; creating new one.");
-      // }
-
-      console.log("put", docId);
+      try {
+        const mydoc = await Promise.race([
+          pouch.get(docId),
+          timeoutPromise(TIMEOUT_DURATION),
+        ]);
+        rev = mydoc._rev;
+        count = mydoc.count || 0;
+      } catch (error: any) {
+        if (error.message === "Operation timed out") {
+          console.log("Document not found; creating new one.");
+        } else {
+          console.log("Error getting document:", error);
+          return;
+        }
+      }
 
       try {
         const result = await pouch.put({
@@ -96,11 +101,11 @@ export default function App() {
           title: "Heroes",
           count: count + 1,
         });
+
+        setResult(JSON.stringify(result, null, 2));
       } catch (e) {
         console.log("pouch.put Error", e);
       }
-
-      setResult(JSON.stringify(result, null, 2));
     });
 
   const handlePutMultiDocs = () =>
@@ -129,6 +134,7 @@ export default function App() {
       const result = await pouch.replicate
         .from(process.env.EXPO_PUBLIC_COUCHDB_URL, { live: false })
         .on("error", (err: any) => console.log("Replication error:", err));
+
       setResult(JSON.stringify(result, null, 2));
     });
 
@@ -183,9 +189,6 @@ export default function App() {
       </View>
     );
 
-  console.log("render");
-  if (isLoading) console.log("loading...");
-
   return (
     <ScrollView
       style={styles.container}
@@ -197,11 +200,11 @@ export default function App() {
         { title: "Put a doc", handler: handlePutDoc },
         { title: "Put multiple docs", handler: handlePutMultiDocs },
         { title: "Delete a doc", handler: handleRemoveDoc },
-        // { title: "Replicate from server", handler: handleReplicate },
+        { title: "Replicate from server", handler: handleReplicate },
         { title: "Truncate DB", handler: handleDeleteAllDocs },
         { title: "Destroy DB", handler: handleDestroyDB },
-        // { title: "Run a query", handler: handleQuery },
-        // { title: "Get an attachment", handler: handleGetAttachment },
+        { title: "Run a query", handler: handleQuery },
+        { title: "Get an attachment", handler: handleGetAttachment },
         { title: "Clear output", handler: handleClearOutput },
       ].map(({ title, handler }) => (
         <TouchableOpacity
