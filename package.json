@@ -1,23 +1,52 @@
 {
   "name": "hello-pouch-mobile",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "./src/index.ts",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "dev": "npx expo start --clear",
+    "start": "npx expo start",
+    "ios": "npx expo run:ios",
+    "build:ios": "react-native build-ios --scheme PouchdbAdapterReactNativeSqliteExample --mode Debug --extra-params \"-sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO\"",
+    "android": "npx expo run:android",
+    "build:android": "react-native build-android --extra-params \"--no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a\"",
+    "web": "npx expo start --web"
   },
   "dependencies": {
+    "@craftzdog/pouchdb-core-react-native": "^7.2.2",
+    "@craftzdog/pouchdb-replication-react-native": "^7.0.0",
+    "events": "^3.3.0",
     "expo": "~52.0.30",
     "expo-status-bar": "~2.0.1",
+    "pouchdb-adapter-http": "^7",
+    "pouchdb-adapter-react-native-sqlite": "3.0.1",
+    "pouchdb-core": "7.3.1",
+    "pouchdb-mapreduce": "^7",
+    "pouchdb-replication": "^7",
     "react": "18.3.1",
-    "react-native": "0.76.6"
+    "react-native": "0.76.6",
+    "react-native-quick-base64": "^2.1.2",
+    "react-native-sqlite-2": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.26.7",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.26.0",
+    "@types/pouchdb-adapter-http": "^6.1.6",
+    "@types/pouchdb-core": "^7.0.15",
+    "@types/pouchdb-mapreduce": "^6.1.10",
+    "@types/pouchdb-replication": "^6.4.7",
     "@types/react": "~18.3.12",
+    "@types/react-native": "^0.73.0",
+    "babel-plugin-module-resolver": "^5.0.2",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "op-sqlite": {
+    "iosSqlite": true
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true,
+  "packageManager": "yarn@3.6.1"
 }
