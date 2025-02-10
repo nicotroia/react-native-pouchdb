@@ -1,4 +1,4 @@
-# PouchDB on React-Ntive example
+# PouchDB on React-Native example
 
 This example project is an expo app bootstrapped with `npx create-expo-app`
 
